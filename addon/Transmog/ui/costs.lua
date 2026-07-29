@@ -1,5 +1,21 @@
 local Transmog = _G.Transmog
 
+local currencyTextLayoutConfigured = false
+
+local function ConfigureCurrencyTextLayout()
+    if currencyTextLayoutConfigured then
+        return
+    end
+
+    TransmogFrameCurrencyText:ClearAllPoints()
+    TransmogFrameCurrencyText:SetWidth(100)
+    TransmogFrameCurrencyText:SetHeight(14)
+    TransmogFrameCurrencyText:SetPoint("RIGHT", TransmogFrameApplyButton, "LEFT", -8, 0)
+    TransmogFrameCurrencyText:SetJustifyH("RIGHT")
+
+    currencyTextLayoutConfigured = true
+end
+
 -- Sends a cost calculation request to the server when transmog changes are pending.
 function Transmog:calculateCost(to)
 
@@ -74,6 +90,7 @@ function Transmog:updateCost(cost, canPurchase)
     end
 
     if cost > 0 then
+        ConfigureCurrencyTextLayout()
         TransmogFrameCurrencyText:Show()
         local copper, silver, gold = formatCurrency(cost)
         local costText = ""
