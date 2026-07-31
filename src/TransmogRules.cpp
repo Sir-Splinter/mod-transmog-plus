@@ -182,6 +182,26 @@ bool TransmogRules_IsItemTransmogrifiable(Player const* player, ItemTemplate con
     return true;
 }
 
+// Collection-only validation deliberately omits character class, race, faction,
+// proficiency, skill, and spell checks. Those restrictions still apply when an
+// appearance is selected for an equipped item.
+bool TransmogRules_IsCollectibleAppearance(ItemTemplate const* proto)
+{
+    if (!proto)
+        return false;
+
+    if (proto->Class != ITEM_CLASS_ARMOR && proto->Class != ITEM_CLASS_WEAPON)
+        return false;
+
+    if (TransmogRules_CanNeverTransmog(proto))
+        return false;
+
+    if (TransmogRules_IsAllowed(proto->ItemId))
+        return true;
+
+    return TransmogRules_IsItemTransmogrifiable(nullptr, proto);
+}
+
 // Combine hard exclusions with configurable requirement and type policies.
 bool TransmogRules_SuitableForTransmogrification(Player const* player, ItemTemplate const* proto)
 {

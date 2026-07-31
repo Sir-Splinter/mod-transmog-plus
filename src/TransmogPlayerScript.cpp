@@ -1,5 +1,4 @@
 #include "Transmog.h"
-#include "Chat.h"
 
 // Player hooks maintain account collections and slot state across lifecycle events.
 class TransmogPlayerScript : public PlayerScript
@@ -10,6 +9,7 @@ public:
         PLAYERHOOK_ON_LOGOUT,
         PLAYERHOOK_ON_DELETE,
         PLAYERHOOK_ON_EQUIP,
+        PLAYERHOOK_ON_STORE_NEW_ITEM,
         PLAYERHOOK_ON_UNEQUIP_ITEM,
         PLAYERHOOK_ON_LEARN_SPELL,
         PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT
@@ -45,29 +45,17 @@ public:
         CharacterDatabase.Execute("DELETE FROM mod_transmog_plus WHERE Owner = {}", guid.GetCounter());
     }
 
-// Re-evaluate the stored appearance against the newly equipped item.
+// Equipping remains an optional unlock path in every collection mode.
     void OnPlayerEquip(Player* player, Item* item, uint8, uint8, bool) override
     {
-        if (!item)
-            return;
+        sTransmog->TryCollectAppearance(player, item, false);
+    }
 
-        ItemTemplate const* itemTemplate = item->GetTemplate();
-        if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
-            return;
-
-        if (TransmogRules_CanNeverTransmog(itemTemplate))
-            return;
-
-        uint32 accountId = player->GetSession()->GetAccountId();
-        uint32 itemId = itemTemplate->ItemId;
-
-        sTransmog->LoadCollectionForAccount(accountId);
-
-        if (sTransmog->AddCollectedAppearance(accountId, itemId))
-        {
-            CharacterDatabase.Execute("INSERT INTO mod_transmog_plus_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
-            ChatHandler(player->GetSession()).PSendSysMessage("{} {}", Transmog::GetItemLink(itemId, player->GetSession()), Tstr(player->GetSession(), LANG_TRANSMOG_APPEARANCE_ADDED));
-        }
+// The generic store hook covers loot, quest rewards, crafting, purchases,
+// trades, mail, containers, scripted rewards, and most other acquisition paths.
+    void OnPlayerStoreNewItem(Player* player, Item* item, uint32) override
+    {
+        sTransmog->TryCollectAppearance(player, item, true);
     }
 
 // Clear the visible override while the equipment slot is empty.
