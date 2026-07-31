@@ -13,6 +13,7 @@ features\apply_transmog.lua
 features\outfits.lua
 features\slash_commands.lua
 ui\lifecycle.lua
+ui\sort_filter.lua
 ui\appearance_list.lua
 ui\slots_model.lua
 ui\costs.lua
