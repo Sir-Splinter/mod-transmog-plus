@@ -17,7 +17,7 @@ This module includes a WoW 3.3.5a client addon in the `addon/` directory. It pro
 visual transmog interface with 3D item preview. If the addon is not installed, the standard
 gossip menu is used as a fallback.
 
-![Addon UI](docs/addon_preview.png)
+![Addon UI](docs/Addon_Preview.png)
 
 Known addon issues:
 - Icon glow border for pending transmog slots not working.
