@@ -44,4 +44,21 @@ void Transmog::LoadConfig()
     IgnoreReqSpell = sConfigMgr->GetOption<bool>("Transmog.IgnoreReqSpell", false);
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmog.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmog.IgnoreReqStats", false);
+
+    uint8 unlockSource = sConfigMgr->GetOption<uint8>("Transmog.CollectionUnlockSource", 0);
+    if (unlockSource > static_cast<uint8>(TransmogCollectionUnlockSource::Acquired))
+        unlockSource = static_cast<uint8>(TransmogCollectionUnlockSource::EquippedOnly);
+    CollectionUnlockSource = static_cast<TransmogCollectionUnlockSource>(unlockSource);
+
+    uint8 bindingRequirement = sConfigMgr->GetOption<uint8>("Transmog.CollectionBindingRequirement", 0);
+    if (bindingRequirement > static_cast<uint8>(TransmogCollectionBindingRequirement::PermanentlyBound))
+        bindingRequirement = static_cast<uint8>(TransmogCollectionBindingRequirement::Any);
+    CollectionBindingRequirement = static_cast<TransmogCollectionBindingRequirement>(bindingRequirement);
+
+    uint8 eligibility = sConfigMgr->GetOption<uint8>("Transmog.CollectionEligibility", 0);
+    if (eligibility > static_cast<uint8>(TransmogCollectionEligibility::AccountCollectible))
+        eligibility = static_cast<uint8>(TransmogCollectionEligibility::CharacterUsable);
+    CollectionEligibility = static_cast<TransmogCollectionEligibility>(eligibility);
+
+    CollectionUnlockOnEquip = sConfigMgr->GetOption<bool>("Transmog.CollectionUnlockOnEquip", true);
 }

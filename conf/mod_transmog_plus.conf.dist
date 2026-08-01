@@ -31,6 +31,97 @@ Transmog.PriceCopper = 1000
 Transmog.Allowed = ""
 Transmog.NotAllowed = ""
 
+###################################################################################################
+#    TRANSMOG COLLECTION UNLOCK RULES
+###################################################################################################
+#
+# Collection and usage are separate:
+#   - Collection rules determine whether an appearance is learned for the account.
+#   - Existing transmog rules still determine whether a character can apply it.
+#
+#    Transmog.CollectionUnlockSource
+#        0 = EQUIPPED_ONLY (LEGACY)
+#            Learn an appearance only when an eligible item is equipped. This preserves the
+#            original module behavior.
+#
+#        1 = ACQUIRED (CUSTOM / RETAIL-INSPIRED FOUNDATION)
+#            Consider an item when it is stored in the player's inventory. The generic core
+#            storage hook covers normal loot, quest rewards, group rewards, crafting, vendors,
+#            trades, mail/AH delivery, containers, scripted rewards, and GM-created items.
+#            Binding and eligibility settings below decide whether it is actually learned.
+#
+#        Default: 0
+#
+#    Transmog.CollectionBindingRequirement
+#        Used only when CollectionUnlockSource = 1.
+#
+#        0 = ANY (CUSTOM CONVENIENCE)
+#            Learn any otherwise eligible acquired item, including freely tradable BoE items.
+#            This is more permissive than retail because acquisition alone is sufficient.
+#
+#        1 = BIND_ON_PICKUP_ONLY (CUSTOM STRICT)
+#            Learn acquired items only when their template is Bind on Pickup. Eligible BoE items
+#            may still be learned when equipped if CollectionUnlockOnEquip is enabled.
+#
+#        2 = PERMANENTLY_BOUND (RETAIL-INSPIRED)
+#            Learn acquired items only when already soulbound, or when the item template is BoP.
+#            This approximates modern retail ownership rules but does not emulate every refund,
+#            temporary trade-window, cosmetic, profession, legendary, or special-item exception.
+#
+#        Default: 0
+#
+#    Transmog.CollectionEligibility
+#        0 = CHARACTER_USABLE (LEGACY / CUSTOM)
+#            The acquiring character must satisfy the module's class, race, faction, proficiency,
+#            skill, spell, quality, event, and item-category rules. Example: a mage does not
+#            collect plate unless existing Ignore/Allow settings make it valid.
+#
+#        1 = ACCOUNT_COLLECTIBLE (RETAIL-INSPIRED)
+#            Learn an otherwise collectible armor/weapon appearance even when the acquiring
+#            character cannot personally use that class or proficiency. Existing restrictions
+#            are still checked when another character attempts to apply the appearance.
+#            Example: a mage may collect plate for the account but cannot wear that appearance.
+#
+#        Default: 0
+#
+#    Transmog.CollectionUnlockOnEquip
+#        0 = Do not unlock specifically from equipping.
+#        1 = Preserve the original module's equip-time unlock behavior in addition to acquisition
+#            rules. Recommended for backward compatibility and for learning BoE items when they
+#            become bound through equipping.
+#
+#        Default: 1
+#
+# PRESET: LEGACY (original module behavior)
+#   CollectionUnlockSource = 0
+#   CollectionBindingRequirement = 0
+#   CollectionEligibility = 0
+#   CollectionUnlockOnEquip = 1
+#
+# PRESET: CUSTOM - every class-usable acquired item
+#   CollectionUnlockSource = 1
+#   CollectionBindingRequirement = 0
+#   CollectionEligibility = 0
+#   CollectionUnlockOnEquip = 1
+#
+# PRESET: CUSTOM - class-usable acquired BoP items only
+#   CollectionUnlockSource = 1
+#   CollectionBindingRequirement = 1
+#   CollectionEligibility = 0
+#   CollectionUnlockOnEquip = 1
+#
+# PRESET: RETAIL-INSPIRED account collection
+#   CollectionUnlockSource = 1
+#   CollectionBindingRequirement = 2
+#   CollectionEligibility = 1
+#   CollectionUnlockOnEquip = 1
+#
+
+Transmog.CollectionUnlockSource = 0
+Transmog.CollectionBindingRequirement = 0
+Transmog.CollectionEligibility = 0
+Transmog.CollectionUnlockOnEquip = 1
+
 #
 #    REQUIREMENTS
 #
