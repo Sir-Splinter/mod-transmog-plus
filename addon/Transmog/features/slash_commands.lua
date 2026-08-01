@@ -1,11 +1,21 @@
 local Transmog = _G.Transmog
 
--- Shows the transmog new-appearance alert anchor window.
+-- Shows the transmog alert anchor, or toggles the session-only UI test mode.
 SLASH_TRANSMOG1 = "/transmog"
 SlashCmdList["TRANSMOG"] = function(cmd)
-    if cmd then
-        Transmog.newTransmogAlert:ShowAnchor()
+    cmd = string.lower((cmd or ""):gsub("^%s+", ""):gsub("%s+$", ""))
+
+    if cmd == "testmode" then
+        Transmog:SetTestMode(not Transmog.testMode)
+        return
     end
+
+    if cmd == "help" then
+        twfprint("/transmog testmode - toggle session-only grid test mode")
+        return
+    end
+
+    Transmog.newTransmogAlert:ShowAnchor()
 end
 
 -- Toggles debug mode on/off.

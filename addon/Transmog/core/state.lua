@@ -19,3 +19,8 @@ Transmog.currentOutfit = nil
 Transmog.equippedTransmogs = {}
 
 Transmog.localCache = {}
+
+-- Session-only visual test mode. This value is intentionally not stored in
+-- SavedVariables and resets whenever the UI is reloaded or the client exits.
+Transmog.testMode = false
+Transmog.testModeDisplayCount = 45

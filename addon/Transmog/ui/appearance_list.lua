@@ -130,6 +130,9 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
     local displayItems = self:GetFilteredSortedAppearances(slot, itemClass)
 
 	self:setProgressBar(self:tableSize(self.transmogDataFromServer[slot][itemClass]), self.numTransmogs[slot][itemClass])
+    if self.testMode then
+        TransmogFrameCollectedCollectedStatus:SetText("Collected: " .. self:tableSize(self.transmogDataFromServer[slot][itemClass]) .. "  |cffff7a00• Test: " .. self:tableSize(displayItems) .. "|r")
+    end
     if self:tableSize(self.transmogDataFromServer[slot][itemClass]) == 0 then
         TransmogFrameNoTransmogs:Show()
     end
@@ -147,7 +150,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 self.ItemButtons[itemIndex] = CreateFrame('Frame', 'TransmogLook' .. itemIndex, TransmogFrame, 'TransmogFrameLookTemplate')
             end
 
-            self.ItemButtons[itemIndex]:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 263 + col * 90, -170 - 120 * row)
+            self.ItemButtons[itemIndex]:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 263 + col * 90, -158 - 120 * row)
 
             self.ItemButtons[itemIndex].name = item.name
             self.ItemButtons[itemIndex].id = item.id
@@ -163,7 +166,11 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
             end
 
             local _, _, _, color = GetItemQualityColor(item.quality)
-            AddButtonOnEnterTextTooltip(getglobal('TransmogLook' .. itemIndex .. 'Button'), color .. item.name)
+            local tooltipName = color .. item.name
+            if self.testMode then
+                tooltipName = tooltipName .. "|r\n|cffff7a00Test preview copy - selection disabled|r"
+            end
+            AddButtonOnEnterTextTooltip(getglobal('TransmogLook' .. itemIndex .. 'Button'), tooltipName)
             if item.reset then
                 getglobal('TransmogLook' .. itemIndex .. 'ButtonRevert'):Show()
             end
@@ -412,6 +419,11 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
 
     if self.currentTransmogSlotName then
         getglobal(self.currentTransmogSlotName .. 'BorderSelected'):Show()
+    end
+
+    if self.testMode then
+        TransmogFrameApplyButton:Disable()
+        TransmogFrameApplyButton:SetText("Test Mode")
     end
 
 end

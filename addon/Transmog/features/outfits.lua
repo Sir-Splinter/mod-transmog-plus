@@ -115,6 +115,10 @@ end
 
 -- Saves the current transmog selections as a saved outfit.
 function Transmog_SaveOutfit()
+    if Transmog.testMode then
+        twfprint("Test mode is preview-only; outfits were not changed.")
+        return
+    end
 	transmogOutfits[Transmog.currentOutfit] = {}
     for InventorySlotId, itemID in pairs(Transmog.transmogStatusFromServer) do
         if itemID ~= 0 then
@@ -131,6 +135,10 @@ end
 
 -- Enables the save outfit button when an outfit is currently selected.
 function Transmog:EnableOutfitSaveButton()
+    if self.testMode then
+        TransmogFrameSaveOutfit:Disable()
+        return
+    end
     if self.currentOutfit ~= nil then
         TransmogFrameSaveOutfit:Enable()
     end
@@ -138,6 +146,10 @@ end
 
 -- Deletes the currently selected outfit.
 function Transmog_deleteOutfit()
+    if Transmog.testMode then
+        twfprint("Test mode is preview-only; outfits were not changed.")
+        return
+    end
     transmogOutfits[Transmog.currentOutfit] = nil
     TransmogFrameSaveOutfit:Disable()
     TransmogFrameDeleteOutfit:Disable()
