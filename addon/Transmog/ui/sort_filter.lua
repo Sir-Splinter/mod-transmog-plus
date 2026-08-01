@@ -17,6 +17,79 @@ local SORT_LABELS = {
 
 local SORT_ORDER = { "LEVEL_DESC", "LEVEL_ASC", "NAME_ASC", "NAME_DESC" }
 
+local function cloneAppearanceForTest(item, copyIndex)
+    local clone = {}
+    for key, value in pairs(item) do
+        clone[key] = value
+    end
+    clone.testCopy = copyIndex
+    return clone
+end
+
+function Transmog:ExpandAppearancesForTestMode(items)
+    if not self.testMode or not items or #items == 0 then
+        return items
+    end
+
+    local targetCount = self.testModeDisplayCount or 45
+    local expanded = {}
+    local sourceCount = #items
+
+    for index = 1, targetCount do
+        local source = items[((index - 1) % sourceCount) + 1]
+        table.insert(expanded, cloneAppearanceForTest(source, index))
+    end
+
+    return expanded
+end
+
+function Transmog:UpdateTestModeIndicator()
+    -- Keep test status visible without occupying header/control space.
+    if TransmogTestModeIndicator then
+        TransmogTestModeIndicator:Hide()
+    end
+
+    if TransmogFrameTitleText then
+        if self.testMode then
+            TransmogFrameTitleText:SetText("Transmogrify  |cffff7a00[TEST MODE]|r")
+        else
+            TransmogFrameTitleText:SetText("Transmogrify")
+        end
+    end
+end
+
+function Transmog:SetTestMode(enabled)
+    self.testMode = enabled and true or false
+    self.currentPage = 1
+    self:UpdateTestModeIndicator()
+    if self.UpdateBottomEquipmentSlots then
+        self:UpdateBottomEquipmentSlots()
+    end
+
+    if TransmogFrameApplyButton then
+        TransmogFrameApplyButton:Disable()
+        if self.testMode then
+            TransmogFrameApplyButton:SetText("Test Mode")
+        else
+            TransmogFrameApplyButton:SetText("Change any Items")
+        end
+    end
+
+    if TransmogFrameSaveOutfit then TransmogFrameSaveOutfit:Disable() end
+    if TransmogFrameDeleteOutfit then TransmogFrameDeleteOutfit:Disable() end
+
+    if self.currentTransmogSlot and self.currentTransmogItemClass then
+        self:renderAvailableTransmogs(self.currentTransmogSlot, self.currentTransmogItemClass)
+    end
+
+    if self.testMode then
+        twfprint("Transmog test mode ON - preview grid only; no data can be changed.")
+    else
+        twfprint("Transmog test mode OFF")
+        if self.calculateCost then self:calculateCost() end
+    end
+end
+
 local function safeLower(value)
     -- GetItemInfo() supplies the complete localized item name. Keep the
     -- complete string intact; do not split it into prefixes or suffixes.
@@ -107,6 +180,7 @@ function Transmog:GetFilteredSortedAppearances(slot, itemClass)
         table.insert(result, 1, hiddenItem)
     end
 
+    return self:ExpandAppearancesForTestMode(result)
     return result
 end
 
@@ -186,6 +260,11 @@ function Transmog:CreateAppearanceSortFilterUI()
     topShade:SetHeight(1)
     topShade:SetTexture(0.55, 0.43, 0.20, 0.45)
 
+    local testIndicator = bar:CreateFontString("TransmogTestModeIndicator", "OVERLAY", "GameFontNormalSmall")
+    testIndicator:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -14, -10)
+    testIndicator:SetText("|cffff7a00TEST MODE - PREVIEW ONLY|r")
+    testIndicator:Hide()
+
     local separator = bar:CreateTexture(nil, "BORDER")
     separator:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 8, 1)
     separator:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -8, 1)
@@ -246,6 +325,7 @@ function Transmog:CreateAppearanceSortFilterUI()
     end)
 
     updateSearchHint()
+    self:UpdateTestModeIndicator()
     bar:Hide()
 end
 

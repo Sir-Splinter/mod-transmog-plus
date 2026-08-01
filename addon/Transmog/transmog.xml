@@ -496,7 +496,7 @@
     </Frame>
     <Frame name="TransmogFrame" hidden="true" toplevel="true" parent="UIParent" movable="true" enableMouse="true">
         <Size>
-            <AbsDimension x="750" y="506"/>
+            <AbsDimension x="750" y="560"/>
         </Size>
         <Anchors>
             <Anchor point="CENTER">
@@ -519,11 +519,24 @@
                         </Anchor>
                     </Anchors>
                 </Texture>
+                <Texture name="$parentLeftBottomFill">
+                    <Size>
+                        <AbsDimension x="222" y="56"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="24"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="0.03" g="0.03" b="0.03" a="1.0"/>
+                </Texture>
             </Layer>
             <Layer level="BORDER">
                 <Texture name="$parentBackground1" file="Interface\AddOns\Transmog\assets\ui1">
                     <Size>
-                        <AbsDimension x="512" y="512"/>
+                        <AbsDimension x="512" y="566"/>
                     </Size>
                     <Anchors>
                         <Anchor point="TOPLEFT">
@@ -535,7 +548,7 @@
                 </Texture>
                 <Texture name="$parentBackground2" file="Interface\AddOns\Transmog\assets\ui2">
                     <Size>
-                        <AbsDimension x="512" y="512"/>
+                        <AbsDimension x="512" y="566"/>
                     </Size>
                     <Anchors>
                         <Anchor point="TOPRIGHT">
@@ -561,7 +574,7 @@
                 </Texture>
                 <Texture name="$parentSplash" file="Interface\AddOns\Transmog\assets\splash">
                     <Size>
-                        <AbsDimension x="512" y="512"/>
+                        <AbsDimension x="512" y="566"/>
                     </Size>
                     <Anchors>
                         <Anchor point="TOPRIGHT">
@@ -628,7 +641,7 @@
                     <Anchors>
                         <Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
                             <Offset>
-                                <AbsDimension x="17" y="20"/>
+                                <AbsDimension x="19" y="23"/>
                             </Offset>
                         </Anchor>
                         <Anchor point="RIGHT" relativeTo="$parentApplyButton" relativePoint="LEFT">
@@ -753,7 +766,7 @@
                 <Anchors>
                     <Anchor point="TOPLEFT">
                         <Offset>
-                            <AbsDimension x="208" y="-120"/>
+                            <AbsDimension x="208" y="-130"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -830,7 +843,7 @@
                 <Anchors>
                     <Anchor point="BOTTOMLEFT">
                         <Offset>
-                            <AbsDimension x="120" y="9"/>
+                            <AbsDimension x="122" y="12"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -867,7 +880,7 @@
                 <Anchors>
                     <Anchor point="TOPLEFT">
                         <Offset>
-                            <AbsDimension x="30" y="-150"/>
+                            <AbsDimension x="30" y="-160"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
@@ -912,7 +925,7 @@
                 <Anchors>
                     <Anchor point="TOPLEFT">
                         <Offset>
-                            <AbsDimension x="205" y="-150"/>
+                            <AbsDimension x="205" y="-160"/>
                         </Offset>
                     </Anchor>
                 </Anchors>

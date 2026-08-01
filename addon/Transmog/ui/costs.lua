@@ -19,6 +19,12 @@ end
 -- Sends a cost calculation request to the server when transmog changes are pending.
 function Transmog:calculateCost(to)
 
+    if self.testMode then
+        TransmogFrameApplyButton:Disable()
+        TransmogFrameApplyButton:SetText("Test Mode")
+        TransmogFrameCurrencyText:Hide()
+        return
+    end
 	twfdebug("Transmog:calculateCost")
 
 	local slots = ""
@@ -79,6 +85,12 @@ end
 
 -- Updates the apply button text and cost display based on server response.
 function Transmog:updateCost(cost, canPurchase)
+    if self.testMode then
+        TransmogFrameApplyButton:Disable()
+        TransmogFrameApplyButton:SetText("Test Mode")
+        TransmogFrameCurrencyText:Hide()
+        return
+    end
     twfdebug("updateCost cost:" .. cost .. " canPurchase: " .. canPurchase)
 
     if canPurchase == 1 then

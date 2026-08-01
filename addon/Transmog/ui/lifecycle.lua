@@ -1,5 +1,30 @@
 local Transmog = _G.Transmog
 
+-- Keeps the weapon-slot row visually centered. Classes without a ranged slot
+-- show two centered buttons during normal use; test mode always shows all
+-- three buttons so the complete layout can be inspected.
+function Transmog:UpdateBottomEquipmentSlots()
+    if not MainHandSlot or not SecondaryHandSlot or not RangedSlot then return end
+
+    MainHandSlot:ClearAllPoints()
+    SecondaryHandSlot:ClearAllPoints()
+    RangedSlot:ClearAllPoints()
+
+    local hidesRanged = self.class == 'druid' or self.class == 'paladin' or self.class == 'shaman'
+
+    if self.testMode or not hidesRanged then
+        MainHandSlot:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 71, -425)
+        SecondaryHandSlot:SetPoint("LEFT", MainHandSlot, "RIGHT", 12, 0)
+        RangedSlot:SetPoint("LEFT", SecondaryHandSlot, "RIGHT", 12, 0)
+        RangedSlot:Show()
+    else
+        -- Center the two visible buttons within the original three-button row.
+        MainHandSlot:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 93, -425)
+        SecondaryHandSlot:SetPoint("LEFT", MainHandSlot, "RIGHT", 12, 0)
+        RangedSlot:Hide()
+    end
+end
+
 -- Initializes the transmog addon on load: sets up UI, hooks, and pre-caches items.
 function Transmog_OnLoad()
 
@@ -34,9 +59,7 @@ function Transmog_OnLoad()
 
     Transmog.delayedLoad:Show()
 
-    if Transmog.class == 'druid' or Transmog.class == 'paladin' or Transmog.class == 'shaman' then
-        RangedSlot:Hide()
-    end
+    Transmog:UpdateBottomEquipmentSlots()
 
     local TWFHookSetInventoryItem = GameTooltip.SetInventoryItem
     function GameTooltip.SetInventoryItem(self, unit, slot)
