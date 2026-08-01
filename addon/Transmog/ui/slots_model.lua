@@ -225,6 +225,9 @@ function selectTransmogSlot(InventorySlotId, slotName)
     TransmogFrameInstructions:Hide()
 
     Transmog.currentPage = 1
+    if Transmog.ResetAppearanceSubtypeFilter then
+        Transmog:ResetAppearanceSubtypeFilter()
+    end
     Transmog.currentTransmogSlotName = slotName
     Transmog.currentTransmogSlot = InventorySlotId
 
@@ -258,7 +261,7 @@ end
 function Transmog_ChangePage(dir)
     Transmog.currentPage = Transmog.currentPage + dir
     if Transmog.tab == 'items' then
-        Transmog:renderAvailableTransmogs(Transmog.currentTransmogSlot)
+        Transmog:renderAvailableTransmogs(Transmog.currentTransmogSlot, Transmog.currentTransmogItemClass)
     else
         Transmog_switchTab(Transmog.tab)
     end

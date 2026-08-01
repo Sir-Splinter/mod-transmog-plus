@@ -27,6 +27,25 @@ constexpr uint32 HIDDEN_ITEM_ID = 999999;
 constexpr uint8 MAX_ITEMS_PER_PAGE = 20;
 
 // Shared result codes keep gossip and addon failures consistent.
+enum class TransmogCollectionUnlockSource : uint8
+{
+    EquippedOnly = 0,
+    Acquired = 1
+};
+
+enum class TransmogCollectionBindingRequirement : uint8
+{
+    Any = 0,
+    BindOnPickupOnly = 1,
+    PermanentlyBound = 2
+};
+
+enum class TransmogCollectionEligibility : uint8
+{
+    CharacterUsable = 0,
+    AccountCollectible = 1
+};
+
 enum class TransmogApplyResult : uint8
 {
     Success,
@@ -110,6 +129,11 @@ public:
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
 
+    TransmogCollectionUnlockSource CollectionUnlockSource;
+    TransmogCollectionBindingRequirement CollectionBindingRequirement;
+    TransmogCollectionEligibility CollectionEligibility;
+    bool CollectionUnlockOnEquip;
+
     // Account appearance data is shared while logged-in characters reference it.
     std::unordered_map<uint32, std::unordered_set<uint32>> collectionCache;
     std::unordered_map<uint32, uint32> collectionRefCounts;
@@ -123,6 +147,7 @@ public:
     void LoadCollectionForAccount(uint32 accountId);
     void UnrefCollectionForAccount(uint32 accountId);
     bool AddCollectedAppearance(uint32 accountId, uint32 itemId);
+    bool TryCollectAppearance(Player* player, Item* item, bool acquired);
     uint32 GetAppearanceCost(uint32 fakeEntry) const;
     // Gossip and addon adapters use one server-side mutation path.
     TransmogApplyResult ApplyAppearance(Player* player, uint8 slot, uint32 fakeEntry);
@@ -164,6 +189,7 @@ bool TransmogRules_TierAvailable(Player const* player, uint32 tier);
 bool TransmogRules_IsRangedWeapon(uint32 itemClass, uint32 subClass);
 bool TransmogRules_CanNeverTransmog(ItemTemplate const* proto);
 bool TransmogRules_IsItemTransmogrifiable(Player const* player, ItemTemplate const* proto);
+bool TransmogRules_IsCollectibleAppearance(ItemTemplate const* proto);
 bool TransmogRules_SuitableForTransmogrification(Player const* player, ItemTemplate const* proto);
 bool TransmogRules_CanTransmogrifyItemWithItem(Player const* player, ItemTemplate const* target, ItemTemplate const* source);
 

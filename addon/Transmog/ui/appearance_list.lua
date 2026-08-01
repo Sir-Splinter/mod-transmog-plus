@@ -81,6 +81,8 @@ function Transmog:prepareAvailableTransmogs(slot, itemClass)
                 ['name'] = name,
                 ['link'] = link,
                 ['quality'] = quality,
+                ['level'] = level or 0,
+                ['min_level'] = min_level or 0,
                 ['t1'] = class,
                 ['t2'] = subclass,
                 ['equip_slot'] = inv_type,
@@ -98,6 +100,8 @@ function Transmog:prepareAvailableTransmogs(slot, itemClass)
             ['name'] = "Hidden " .. slotLabel,
             ['link'] = nil,
             ['quality'] = 0,
+            ['level'] = -1,
+            ['min_level'] = 0,
             ['t1'] = nil,
             ['t2'] = nil,
             ['equip_slot'] = nil,
@@ -121,6 +125,10 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
     self:hideItems(true)
     self:hideItemBorders()
 
+	self:UpdateAppearanceSortFilterUI(slot, itemClass)
+
+    local displayItems = self:GetFilteredSortedAppearances(slot, itemClass)
+
 	self:setProgressBar(self:tableSize(self.transmogDataFromServer[slot][itemClass]), self.numTransmogs[slot][itemClass])
     if self:tableSize(self.transmogDataFromServer[slot][itemClass]) == 0 then
         TransmogFrameNoTransmogs:Show()
@@ -131,7 +139,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
     local col = 0
     local itemIndex = 1
 
-    for _, item in ipairs(self.availableTransmogItems[slot][itemClass]) do
+    for _, item in ipairs(displayItems) do
 
         if index >= (self.currentPage - 1) * self.ipp and index < self.currentPage * self.ipp then
 
@@ -139,7 +147,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 self.ItemButtons[itemIndex] = CreateFrame('Frame', 'TransmogLook' .. itemIndex, TransmogFrame, 'TransmogFrameLookTemplate')
             end
 
-            self.ItemButtons[itemIndex]:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 263 + col * 90, -105 - 120 * row)
+            self.ItemButtons[itemIndex]:SetPoint("TOPLEFT", TransmogFrame, "TOPLEFT", 263 + col * 90, -170 - 120 * row)
 
             self.ItemButtons[itemIndex].name = item.name
             self.ItemButtons[itemIndex].id = item.id
@@ -380,7 +388,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
         index = index + 1
     end
 
-    self.totalPages = self:ceil(self:tableSize(self.availableTransmogItems[slot][itemClass]) / self.ipp)
+    self.totalPages = math.max(1, self:ceil(self:tableSize(displayItems) / self.ipp))
 
     TransmogFramePageText:SetText("Page " .. self.currentPage .. "/" .. self.totalPages)
 
@@ -390,7 +398,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
         TransmogFrameLeftArrow:Enable()
     end
 
-    if self.currentPage == self.totalPages or self:tableSize(self.availableTransmogItems[slot][itemClass]) < self.ipp then
+    if self.currentPage >= self.totalPages or self:tableSize(displayItems) <= self.ipp then
         TransmogFrameRightArrow:Disable()
     else
         TransmogFrameRightArrow:Enable()
