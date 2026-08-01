@@ -120,6 +120,12 @@ end
 -- Sends all pending transmog changes to the server.
 function Apply_OnClick()
 
+    if Transmog.testMode then
+        twfprint("Test mode is preview-only; no changes were sent to the server.")
+        TransmogFrameApplyButton:Disable()
+        return
+    end
+
     local pending = 0
     for InventorySlotId, itemID in pairs(Transmog.transmogStatusToServer) do
         if Transmog.transmogStatusFromServer[InventorySlotId] ~= itemID then

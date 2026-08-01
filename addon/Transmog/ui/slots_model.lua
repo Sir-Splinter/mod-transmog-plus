@@ -74,6 +74,10 @@ end
 
 -- Previews a transmog appearance on the selected equipment slot.
 function Transmog_Try(itemId, slotName, newReset)
+    if Transmog.testMode then
+        twfprint("Test mode is preview-only; no transmog selection was changed.")
+        return
+    end
 	twfdebug("Transmog_Try itemID: " .. itemId .. "slotName: " .. slotName)
 
     if newReset and getglobal(slotName .. "NoEquip"):IsVisible() then
@@ -271,6 +275,10 @@ end
 
 -- Reverts all pending transmog edits, discarding un-applied changes.
 function Transmog_revert()
+    if Transmog.testMode then
+        twfprint("Test mode is preview-only; nothing was reverted.")
+        return
+    end
     for InventorySlotId, itemID in pairs(Transmog.transmogStatusFromServer) do
         Transmog.transmogStatusToServer[InventorySlotId] = itemID
     end
