@@ -225,9 +225,6 @@ function selectTransmogSlot(InventorySlotId, slotName)
     TransmogFrameInstructions:Hide()
 
     Transmog.currentPage = 1
-    if Transmog.ResetAppearanceSubtypeFilter then
-        Transmog:ResetAppearanceSubtypeFilter()
-    end
     Transmog.currentTransmogSlotName = slotName
     Transmog.currentTransmogSlot = InventorySlotId
 
@@ -259,8 +256,13 @@ end
 
 -- Navigates between pages of transmog options or outfit tabs.
 function Transmog_ChangePage(dir)
-    Transmog.currentPage = Transmog.currentPage + dir
     if Transmog.tab == 'items' then
+        if not Transmog.currentTransmogSlot or not Transmog.currentTransmogItemClass then
+            return
+        end
+
+        local totalPages = math.max(1, Transmog.totalPages or 1)
+        Transmog.currentPage = math.max(1, math.min(Transmog.currentPage + dir, totalPages))
         Transmog:renderAvailableTransmogs(Transmog.currentTransmogSlot, Transmog.currentTransmogItemClass)
     else
         Transmog_switchTab(Transmog.tab)
