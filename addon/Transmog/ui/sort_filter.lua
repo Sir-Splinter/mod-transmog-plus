@@ -181,7 +181,6 @@ function Transmog:GetFilteredSortedAppearances(slot, itemClass)
     end
 
     return self:ExpandAppearancesForTestMode(result)
-    return result
 end
 
 local function refreshList()
