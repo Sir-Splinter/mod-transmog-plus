@@ -79,7 +79,7 @@ visual transmog interface with 3D item preview, sorting, filtering, search, pagi
 session-only layout test mode. If the addon is not installed, the standard gossip menu is used
 as a fallback.
 
-![Addon UI](docs/Addon_Preview.png)
+![Addon UI](docs/addon_preview.png)
 
 Test mode can be toggled with:
 
@@ -109,6 +109,27 @@ Addon installation (optional): copy the `addon/Transmog/` folder to your client'
 All prices, quality restrictions, type rules, collection rules, and requirement ignores are
 configurable in `mod_transmog_plus.conf`. See the distributed config file for details.
 
+### Live configuration reload
+
+After rebuilding once with live-reload support, runtime transmog settings can be changed without
+restarting worldserver. Edit the active `mod_transmog_plus.conf`, then run:
+
+```text
+.reload config
+```
+
+The reload updates:
+
+- Module enablement and transmog price.
+- Allowed and denied item-entry lists.
+- Collection unlock mode, binding requirement, and eligibility.
+- Allowed item qualities.
+- Armor, off-hand, weapon-type, handedness, tier, and fishing-pole rules.
+- Race, class, skill, spell, event, and stat requirement-ignore settings.
+
+New values apply to subsequent acquisitions, equips, and transmog actions. Reloading the config does
+not delete or rebuild collected appearances, applied slot records, or database data.
+
 ## Known Limitations
 
 - **Hidden appearance**: When a slot is hidden, its character-sheet icon turns invisible
@@ -127,3 +148,4 @@ configurable in `mod_transmog_plus.conf`. See the distributed config file for de
 ## License
 
 GNU Affero General Public License v3 -- see `LICENSE`.
+

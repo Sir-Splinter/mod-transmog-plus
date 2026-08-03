@@ -32,6 +32,26 @@ Transmog.Allowed = ""
 Transmog.NotAllowed = ""
 
 ###################################################################################################
+#    LIVE CONFIGURATION RELOAD
+###################################################################################################
+#
+# Runtime transmog settings can be reloaded without restarting worldserver.
+# After editing the active mod_transmog_plus.conf, run this command in game or the server console:
+#
+#     .reload config
+#
+# The following settings are reloaded:
+#   - Transmog.Enable and Transmog.PriceCopper
+#   - Transmog.Allowed and Transmog.NotAllowed
+#   - Collection unlock mode, binding requirement, and eligibility
+#   - Allowed item-quality settings
+#   - Armor, off-hand, weapon-type, handedness, tier, and fishing-pole rules
+#   - Race, class, skill, spell, event, and stat requirement-ignore settings
+#
+# New values apply to subsequent collection and transmog actions. Existing collected appearances,
+# applied slot records, and database data are not deleted or rebuilt by a config reload.
+#
+###################################################################################################
 #    TRANSMOG COLLECTION UNLOCK RULES
 ###################################################################################################
 #
