@@ -39,29 +39,51 @@ Transmog.NotAllowed = ""
 #   - Collection rules determine whether an appearance is learned for the account.
 #   - Existing transmog rules still determine whether a character can apply it.
 #
-#    Transmog.CollectionUnlockSource
-#        0 = EQUIPPED_ONLY (LEGACY)
-#            Learn an appearance only when an eligible item is equipped. This preserves the
-#            original module behavior.
+#    Transmog.CollectionUnlockMode
+#        0 = EQUIPPED_ONLY (LEGACY / SAFEST DEFAULT)
+#            Preserve the original module behavior. Learn an eligible appearance only when the
+#            item is equipped.
 #
-#        1 = ACQUIRED (CUSTOM / RETAIL-INSPIRED FOUNDATION)
+#        1 = ACQUIRED_ONLY
 #            Consider an item when it is stored in the player's inventory. The generic core
 #            storage hook covers normal loot, quest rewards, group rewards, crafting, vendors,
 #            trades, mail/AH delivery, containers, scripted rewards, and GM-created items.
 #            Binding and eligibility settings below decide whether it is actually learned.
+#            Items rejected at acquisition are not learned later by equipping them.
+#
+#        2 = ACQUIRED_AND_EQUIPPED
+#            Consider items both when acquired and when equipped. Acquisition uses the binding
+#            requirement below. Equipping provides a fallback for eligible items that were not
+#            learned on acquisition, such as Bind-on-Equip items that become soulbound on equip.
 #
 #        Default: 0
 #
+#    Backward compatibility
+#        Existing installations may continue using these deprecated settings temporarily:
+#            Transmog.CollectionUnlockSource
+#            Transmog.CollectionUnlockOnEquip
+#
+#        When CollectionUnlockMode is absent, the module translates the old values for that
+#        startup and prints a yellow warning asking the administrator to update the config.
+#        When CollectionUnlockMode is present, it is authoritative and the deprecated settings
+#        are ignored, so they cannot override or interfere with the new option.
+#
+#        Legacy mapping:
+#            Source 0 + UnlockOnEquip 1 -> Mode 0 (EQUIPPED_ONLY)
+#            Source 1 + UnlockOnEquip 0 -> Mode 1 (ACQUIRED_ONLY)
+#            Source 1 + UnlockOnEquip 1 -> Mode 2 (ACQUIRED_AND_EQUIPPED)
+#            Source 0 + UnlockOnEquip 0 -> Mode 0 with a warning
+#
 #    Transmog.CollectionBindingRequirement
-#        Used only when CollectionUnlockSource = 1.
+#        Used only for acquisition-time collection in modes 1 and 2.
 #
 #        0 = ANY (CUSTOM CONVENIENCE)
 #            Learn any otherwise eligible acquired item, including freely tradable BoE items.
 #            This is more permissive than retail because acquisition alone is sufficient.
 #
 #        1 = BIND_ON_PICKUP_ONLY (CUSTOM STRICT)
-#            Learn acquired items only when their template is Bind on Pickup. Eligible BoE items
-#            may still be learned when equipped if CollectionUnlockOnEquip is enabled.
+#            Learn acquired items only when their template is Bind on Pickup. In mode 2, eligible
+#            BoE items may still be learned later when equipped.
 #
 #        2 = PERMANENTLY_BOUND (RETAIL-INSPIRED)
 #            Learn acquired items only when already soulbound, or when the item template is BoP.
@@ -72,56 +94,41 @@ Transmog.NotAllowed = ""
 #
 #    Transmog.CollectionEligibility
 #        0 = CHARACTER_USABLE (LEGACY / CUSTOM)
-#            The acquiring character must satisfy the module's class, race, faction, proficiency,
+#            The receiving character must satisfy the module's class, race, faction, proficiency,
 #            skill, spell, quality, event, and item-category rules. Example: a mage does not
 #            collect plate unless existing Ignore/Allow settings make it valid.
 #
 #        1 = ACCOUNT_COLLECTIBLE (RETAIL-INSPIRED)
-#            Learn an otherwise collectible armor/weapon appearance even when the acquiring
+#            Learn an otherwise collectible armor/weapon appearance even when the receiving
 #            character cannot personally use that class or proficiency. Existing restrictions
 #            are still checked when another character attempts to apply the appearance.
 #            Example: a mage may collect plate for the account but cannot wear that appearance.
 #
 #        Default: 0
 #
-#    Transmog.CollectionUnlockOnEquip
-#        0 = Do not unlock specifically from equipping.
-#        1 = Preserve the original module's equip-time unlock behavior in addition to acquisition
-#            rules. Recommended for backward compatibility and for learning BoE items when they
-#            become bound through equipping.
-#
-#        Default: 1
-#
 # PRESET: LEGACY (original module behavior)
-#   CollectionUnlockSource = 0
+#   CollectionUnlockMode = 0
 #   CollectionBindingRequirement = 0
 #   CollectionEligibility = 0
-#   CollectionUnlockOnEquip = 1
 #
 # PRESET: CUSTOM - every class-usable acquired item
-#   CollectionUnlockSource = 1
+#   CollectionUnlockMode = 1
 #   CollectionBindingRequirement = 0
 #   CollectionEligibility = 0
-#   CollectionUnlockOnEquip = 1
 #
-# PRESET: CUSTOM - class-usable acquired BoP items only
-#   CollectionUnlockSource = 1
+# PRESET: CUSTOM - class-usable acquired BoP items with equip fallback
+#   CollectionUnlockMode = 2
 #   CollectionBindingRequirement = 1
 #   CollectionEligibility = 0
-#   CollectionUnlockOnEquip = 1
 #
 # PRESET: RETAIL-INSPIRED account collection
-#   CollectionUnlockSource = 1
+#   CollectionUnlockMode = 2
 #   CollectionBindingRequirement = 2
 #   CollectionEligibility = 1
-#   CollectionUnlockOnEquip = 1
 #
-
-Transmog.CollectionUnlockSource = 0
+Transmog.CollectionUnlockMode = 0
 Transmog.CollectionBindingRequirement = 0
 Transmog.CollectionEligibility = 0
-Transmog.CollectionUnlockOnEquip = 1
-
 #
 #    REQUIREMENTS
 #

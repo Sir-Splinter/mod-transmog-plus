@@ -69,7 +69,7 @@ bool Transmog::TryCollectAppearance(Player* player, Item* item, bool acquired)
 
     if (acquired)
     {
-        if (CollectionUnlockSource != TransmogCollectionUnlockSource::Acquired)
+        if (CollectionUnlockMode == TransmogCollectionUnlockMode::EquippedOnly)
             return false;
 
         switch (CollectionBindingRequirement)
@@ -86,7 +86,7 @@ bool Transmog::TryCollectAppearance(Player* player, Item* item, bool acquired)
                 break;
         }
     }
-    else if (!CollectionUnlockOnEquip)
+    else if (CollectionUnlockMode == TransmogCollectionUnlockMode::AcquiredOnly)
     {
         return false;
     }

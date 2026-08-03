@@ -1,210 +1,129 @@
 # mod-transmog-plus
 
 Slot-based transmogrification module for [AzerothCore](https://github.com/azerothcore/azerothcore-wotlk).
-
-Appearances are stored per equipment slot rather than per item, so your selected look remains active when you replace or swap gear.
+Appearances are stored per slot (not per item), so your look stays when you swap gear.
 
 ## Features
 
-- Slot-based transmogrification — appearances remain attached to the equipment slot when gear is swapped.
-- Account-wide appearance collection — appearances unlocked by one character are available to every character on the same account.
-- Configurable appearance-unlock rules.
-- Optional retail-inspired collection behavior.
-- Optional appearance unlocking when an item is obtained.
-- Optional appearance unlocking when an item is equipped.
-- Configurable binding requirements for collection.
-- Configurable class, armor-type, weapon-type, race, and proficiency eligibility checks.
-- Option to hide individual armor slots, including helm, shoulders, chest, cloak, and other supported slots.
-- Configurable prices, quality restrictions, type rules, and requirement overrides.
-- Gossip-menu fallback when the client addon is not installed.
+- Slot-based transmog -- appearances stay on the equipment slot when you swap gear.
+- Account-wide collection -- any appearance unlocked by one character is available account-wide.
+- Configurable appearance collection on equip, acquisition, or both.
+- Optional account-wide collection of otherwise valid armor and weapon appearances, even when the acquiring character cannot personally use them.
+- Configurable acquisition binding requirements.
+- Option to hide individual armor slots (helm, shoulders, chest, etc.).
 
-## Collection Modes
+## Collection Unlock Modes
 
-The module supports several collection configurations.
+Appearance collection and appearance usage are separate systems. Collection settings determine
+whether an appearance is learned for the account. The existing transmog restrictions still
+determine whether a character may apply that appearance.
 
-### Legacy behavior
-
-Appearances unlock when an eligible item is equipped.
+The main collection setting is:
 
 ```ini
-Transmog.CollectionUnlockSource = 0
+Transmog.CollectionUnlockMode = 0
+```
+
+Available modes:
+
+- `0 = EQUIPPED_ONLY` -- original module behavior. An eligible appearance is learned when the item is equipped.
+- `1 = ACQUIRED_ONLY` -- an eligible appearance is learned when the item enters the player's inventory. Acquisition binding rules apply.
+- `2 = ACQUIRED_AND_EQUIPPED` -- checks items on acquisition and again on equip. Equip acts as a fallback for items that were not collectible before becoming bound.
+
+The safest default is `0`, which preserves the original equip-only behavior.
+
+Additional collection options:
+
+```ini
 Transmog.CollectionBindingRequirement = 0
 Transmog.CollectionEligibility = 0
-Transmog.CollectionUnlockOnEquip = 1
 ```
 
-### Retail-inspired behavior
+`Transmog.CollectionBindingRequirement` applies to acquisition-time collection in modes `1` and `2`:
 
-Eligible appearances are collected when an item is obtained and satisfies the configured binding requirements.
+- `0 = ANY` -- collect any otherwise eligible acquired item.
+- `1 = BIND_ON_PICKUP_ONLY` -- collect acquired items only when their template is Bind on Pickup.
+- `2 = PERMANENTLY_BOUND` -- collect acquired items that are already soulbound or whose template is Bind on Pickup.
 
-Collection eligibility is evaluated independently from whether a character may currently apply that appearance.
+`Transmog.CollectionEligibility` controls who may collect an appearance:
+
+- `0 = CHARACTER_USABLE` -- the current character must satisfy the normal class, race, proficiency, quality, and item-category rules.
+- `1 = ACCOUNT_COLLECTIBLE` -- collect otherwise valid armor and weapon appearances for the account even when the current character cannot personally use them. Normal restrictions still apply when applying the appearance.
+
+Example presets:
 
 ```ini
-Transmog.CollectionUnlockSource = 1
+# Original behavior
+Transmog.CollectionUnlockMode = 0
+Transmog.CollectionBindingRequirement = 0
+Transmog.CollectionEligibility = 0
+
+# Retail-inspired account collection
+Transmog.CollectionUnlockMode = 2
 Transmog.CollectionBindingRequirement = 2
 Transmog.CollectionEligibility = 1
-Transmog.CollectionUnlockOnEquip = 1
 ```
 
-This allows an account to collect eligible appearances across different characters and classes while retaining the normal application restrictions.
+Older installations using `Transmog.CollectionUnlockSource` and
+`Transmog.CollectionUnlockOnEquip` remain supported temporarily. When the new
+`Transmog.CollectionUnlockMode` setting is absent, the module translates the old values and
+prints a warning asking the administrator to update the configuration. When the new setting is
+present, it is authoritative and the deprecated settings do not override it.
 
-See `conf/mod_transmog_plus.conf.dist` for descriptions of every mode and available value.
+See `conf/mod_transmog_plus.conf.dist` for full descriptions and presets.
 
-## Optional Client Addon
+## Optional Addon (WIP)
 
-This module includes a WoW 3.3.5a client addon in the `addon/` directory.
+This module includes a WoW 3.3.5a client addon in the `addon/` directory. It provides a
+visual transmog interface with 3D item preview, sorting, filtering, search, pagination, and a
+session-only layout test mode. If the addon is not installed, the standard gossip menu is used
+as a fallback.
 
-The addon provides:
+![Addon UI](docs/addon_preview.png)
 
-- Visual transmogrification interface.
-- 3D character and appearance previews.
-- Appearance sorting by item level or name.
-- Appearance filtering by item subtype.
-- Full-name appearance search.
-- Collected-appearance counter.
-- Multi-page appearance grid.
-- Outfit saving and loading.
-- Slot hiding and reset controls.
-- Class-aware weapon-slot display.
-- Session-only layout test mode.
-
-If the addon is not installed, the standard gossip menu is used as a fallback.
-
-![Addon UI](docs/Addon_Preview.png)
-
-### Addon test mode
-
-The addon includes a client-side test mode for testing the layout without adding appearances or changing account or character data.
-
-Toggle it with:
+Test mode can be toggled with:
 
 ```text
 /transmog testmode
 ```
 
-While test mode is active:
+Test mode fills the appearance grid with client-side preview entries without changing account,
+character, collection, or server data. It resets after logout, client restart, or `/reload`.
 
-- The appearance grid is filled with repeated client-side preview entries.
-- Three appearance pages can be tested.
-- All three lower equipment-slot buttons are displayed.
-- Applying transmogrifications is disabled.
-- Outfit modification is disabled.
-- No collection, account, character, or server data is changed.
-- The window title indicates that test mode is active.
-
-Run the command again to disable test mode.
-
-Test mode is not saved and automatically resets after logout, client restart, or `/reload`.
-
-### Known addon issue
-
-- The glow border for equipment slots with pending transmogrification changes may not display correctly.
+Known addon issues:
+- Icon glow border for pending transmog slots not working.
 
 ## Installation
 
-1. Place the module under the `modules/` directory of your AzerothCore source tree.
+1. Place the module under the `modules/` folder of your AzerothCore source directory.
+2. Re-run CMake and build.
+3. Copy `conf/mod_transmog_plus.conf.dist` to `mod_transmog_plus.conf` and adjust as needed.
+4. Import the SQL files manually, or let AzerothCore auto-import them on next server start.
+5. Spawn the Transmog NPC in-game: `.npc add 190012`
 
-   ```text
-   modules/mod-transmog-plus
-   ```
-
-2. Re-run CMake and rebuild AzerothCore.
-
-3. Copy:
-
-   ```text
-   conf/mod_transmog_plus.conf.dist
-   ```
-
-   to:
-
-   ```text
-   mod_transmog_plus.conf
-   ```
-
-4. Review and adjust the configuration options.
-
-5. Import the SQL files manually, or allow AzerothCore to auto-import them during the next server startup.
-
-6. Spawn the transmogrification NPC in game:
-
-   ```text
-   .npc add 190012
-   ```
-
-### Addon installation
-
-Copy:
-
-```text
-addon/Transmog/
-```
-
-to the WoW client's addon directory:
-
-```text
-Interface/AddOns/Transmog/
-```
-
-Restart the client or run:
-
-```text
-/reload
-```
-
-after replacing addon files.
+Addon installation (optional): copy the `addon/Transmog/` folder to your client's
+`Interface/AddOns/` directory.
 
 ## Configuration
 
-All module settings are documented in:
-
-```text
-conf/mod_transmog_plus.conf.dist
-```
-
-Configuration includes:
-
-- Collection unlock source.
-- Collection binding requirements.
-- Collection eligibility rules.
-- Unlock-on-equip behavior.
-- Account-wide collection behavior.
-- Transmogrification prices.
-- Item-quality restrictions.
-- Armor and weapon compatibility.
-- Mixed armor-type rules.
-- Class, race, skill, level, and proficiency requirements.
-- Requirement-ignore options.
-- Hidden-slot behavior.
-
-Collection eligibility and appearance application restrictions are separate systems.
-
-For example, retail-inspired collection may allow an account to collect an appearance through one character while normal armor, weapon, or class restrictions continue to control which characters may apply it.
+All prices, quality restrictions, type rules, collection rules, and requirement ignores are
+configurable in `mod_transmog_plus.conf`. See the distributed config file for details.
 
 ## Known Limitations
 
-### Hidden appearance icon
-
-When an equipment slot is hidden, its character-sheet icon becomes invisible instead of displaying a dedicated hidden-slot icon.
-
-A fake item entry is used to represent the hidden state because it is required for the client equipment display to refresh correctly.
-
-### Equipment-set counter
-
-Transmogrifying an item belonging to an equipment set may cause the client to display an incorrect equipped-set count, such as `5/6` instead of `6/6`.
-
-The set bonus continues to function correctly. This is only a character-sheet display issue.
-
-### Client cache
-
-Some appearance, equipment, or addon-display changes may require a relog or `/reload` before the client refreshes every visual element.
+- **Hidden appearance**: When a slot is hidden, its character-sheet icon turns invisible
+  instead of showing a special icon. This happens because a fake item entry number is used
+  to represent the hidden state, which is necessary for proper equipment refresh.
+- **Set bonus counter**: Transmogging an item that belongs to an equipment set causes the
+  client to show an incorrect set count (e.g. 5/6 instead of 6/6). The set bonus still
+  functions correctly -- this is a display-only issue in the character sheet.
 
 ## Credits
 
 - [flekz-games](https://github.com/flekz-games) for [cmangos-transmog](https://github.com/flekz-games/cmangos-transmog)
 - [malinmr](https://github.com/malinmr) for porting the addon to AzerothCore
-- [Stefan2102](https://github.com/Stefan2102) for the original `mod-transmog-plus` AzerothCore module
+- [Stefan2102](https://github.com/Stefan2102) for the original `mod-transmog-plus` module
 
 ## License
 
-GNU Affero General Public License v3. See `LICENSE`.
+GNU Affero General Public License v3 -- see `LICENSE`.

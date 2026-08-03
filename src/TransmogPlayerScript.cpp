@@ -45,7 +45,7 @@ public:
         CharacterDatabase.Execute("DELETE FROM mod_transmog_plus WHERE Owner = {}", guid.GetCounter());
     }
 
-// Equipping remains an optional unlock path in every collection mode.
+// Equip-time collection is enabled by EQUIPPED_ONLY and ACQUIRED_AND_EQUIPPED modes.
     void OnPlayerEquip(Player* player, Item* item, uint8, uint8, bool) override
     {
         sTransmog->TryCollectAppearance(player, item, false);

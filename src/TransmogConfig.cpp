@@ -1,4 +1,5 @@
 #include "Transmog.h"
+#include "Log.h"
 
 namespace
 {
@@ -45,10 +46,65 @@ void Transmog::LoadConfig()
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmog.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmog.IgnoreReqStats", false);
 
-    uint8 unlockSource = sConfigMgr->GetOption<uint8>("Transmog.CollectionUnlockSource", 0);
-    if (unlockSource > static_cast<uint8>(TransmogCollectionUnlockSource::Acquired))
-        unlockSource = static_cast<uint8>(TransmogCollectionUnlockSource::EquippedOnly);
-    CollectionUnlockSource = static_cast<TransmogCollectionUnlockSource>(unlockSource);
+    // CollectionUnlockMode replaces the older pair of CollectionUnlockSource and
+    // CollectionUnlockOnEquip. A negative sentinel lets existing installations
+    // continue using their old config until an administrator updates it.
+    int32 configuredUnlockMode = sConfigMgr->GetOption<int32>("Transmog.CollectionUnlockMode", -1);
+    if (configuredUnlockMode >= 0)
+    {
+        if (configuredUnlockMode > static_cast<int32>(TransmogCollectionUnlockMode::AcquiredAndEquipped))
+        {
+            LOG_WARN("module", "mod-transmog-plus: Invalid Transmog.CollectionUnlockMode value {}. "
+                "Expected 0, 1, or 2. Falling back to 0 (EQUIPPED_ONLY).", configuredUnlockMode);
+            configuredUnlockMode = static_cast<int32>(TransmogCollectionUnlockMode::EquippedOnly);
+        }
+
+        // The new option is authoritative. Deprecated options are intentionally
+        // not read here, so they can never override or interfere with it.
+        CollectionUnlockMode = static_cast<TransmogCollectionUnlockMode>(configuredUnlockMode);
+    }
+    else
+    {
+        uint8 legacyUnlockSource = sConfigMgr->GetOption<uint8>("Transmog.CollectionUnlockSource", 0);
+        bool legacyUnlockOnEquip = sConfigMgr->GetOption<bool>("Transmog.CollectionUnlockOnEquip", true);
+
+        if (legacyUnlockSource > 1)
+        {
+            LOG_WARN("module", "mod-transmog-plus: Invalid deprecated Transmog.CollectionUnlockSource value {}. "
+                "Treating it as 0 (EQUIPPED_ONLY).", static_cast<uint32>(legacyUnlockSource));
+            legacyUnlockSource = 0;
+        }
+
+        if (legacyUnlockSource == 1)
+        {
+            CollectionUnlockMode = legacyUnlockOnEquip
+                ? TransmogCollectionUnlockMode::AcquiredAndEquipped
+                : TransmogCollectionUnlockMode::AcquiredOnly;
+        }
+        else
+        {
+            // The obsolete 0 + 0 combination used to stop all collection. There
+            // is no collection-disabled mode now; Transmog.Enable controls the
+            // module, so the safest migration is the original equip-only behavior.
+            CollectionUnlockMode = TransmogCollectionUnlockMode::EquippedOnly;
+            if (!legacyUnlockOnEquip)
+            {
+                LOG_WARN("module", "mod-transmog-plus: Deprecated collection settings resolve to no unlock path. "
+                    "Falling back to Transmog.CollectionUnlockMode = 0 (EQUIPPED_ONLY). "
+                    "Use Transmog.Enable = 0 to disable the module.");
+            }
+        }
+
+        LOG_WARN("module", "================================================================");
+        LOG_WARN("module", "mod-transmog-plus: OUTDATED COLLECTION CONFIGURATION DETECTED");
+        LOG_WARN("module", "mod-transmog-plus: Transmog.CollectionUnlockSource and "
+            "Transmog.CollectionUnlockOnEquip are deprecated.");
+        LOG_WARN("module", "mod-transmog-plus: Their values were translated for this startup. "
+            "Update mod_transmog_plus.conf and add:");
+        LOG_WARN("module", "mod-transmog-plus: Transmog.CollectionUnlockMode = {}",
+            static_cast<uint32>(CollectionUnlockMode));
+        LOG_WARN("module", "================================================================");
+    }
 
     uint8 bindingRequirement = sConfigMgr->GetOption<uint8>("Transmog.CollectionBindingRequirement", 0);
     if (bindingRequirement > static_cast<uint8>(TransmogCollectionBindingRequirement::PermanentlyBound))
@@ -60,5 +116,4 @@ void Transmog::LoadConfig()
         eligibility = static_cast<uint8>(TransmogCollectionEligibility::CharacterUsable);
     CollectionEligibility = static_cast<TransmogCollectionEligibility>(eligibility);
 
-    CollectionUnlockOnEquip = sConfigMgr->GetOption<bool>("Transmog.CollectionUnlockOnEquip", true);
 }

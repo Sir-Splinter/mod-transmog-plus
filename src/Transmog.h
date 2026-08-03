@@ -27,10 +27,11 @@ constexpr uint32 HIDDEN_ITEM_ID = 999999;
 constexpr uint8 MAX_ITEMS_PER_PAGE = 20;
 
 // Shared result codes keep gossip and addon failures consistent.
-enum class TransmogCollectionUnlockSource : uint8
+enum class TransmogCollectionUnlockMode : uint8
 {
     EquippedOnly = 0,
-    Acquired = 1
+    AcquiredOnly = 1,
+    AcquiredAndEquipped = 2
 };
 
 enum class TransmogCollectionBindingRequirement : uint8
@@ -129,10 +130,9 @@ public:
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
 
-    TransmogCollectionUnlockSource CollectionUnlockSource;
+    TransmogCollectionUnlockMode CollectionUnlockMode;
     TransmogCollectionBindingRequirement CollectionBindingRequirement;
     TransmogCollectionEligibility CollectionEligibility;
-    bool CollectionUnlockOnEquip;
 
     // Account appearance data is shared while logged-in characters reference it.
     std::unordered_map<uint32, std::unordered_set<uint32>> collectionCache;
