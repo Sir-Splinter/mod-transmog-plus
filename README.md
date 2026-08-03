@@ -79,7 +79,7 @@ visual transmog interface with 3D item preview, sorting, filtering, search, pagi
 session-only layout test mode. If the addon is not installed, the standard gossip menu is used
 as a fallback.
 
-![Addon UI](docs/addon_preview.png)
+![Addon UI](docs/Addon_Preview.png)
 
 Test mode can be toggled with:
 
